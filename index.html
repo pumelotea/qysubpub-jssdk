@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>qysubpub-jssdk</title>
+  <link rel="stylesheet" href="http://unpkg.com/element-plus/dist/index.css"/>
+  <!-- 导入 Vue 3 -->
+  <script src="http://unpkg.com/vue@next"></script>
+  <!-- 导入组件库 -->
+  <script src="http://unpkg.com/element-plus"></script>
+  <script src="lib/qysubpub.js"></script>
+</head>
+<body>
+<div id="app" style="display: flex">
+  <div>
+    <div style="width: 400px;display: flex">
+      <el-button @click="connect">连接</el-button>
+      <el-button @click="close">断开</el-button>
+      <el-input style="margin-left: 10px" v-model="ws"></el-input>
+    </div>
+    <div style="width: 400px;display: flex;margin-top: 10px">
+      <el-button @click="sub">订阅</el-button>
+      <el-input style="margin-left: 10px" v-model="topic1"></el-input>
+    </div>
+    <div style="width: 400px;display: flex;margin-top: 10px">
+      <el-button @click="unsub">退订</el-button>
+      <el-input style="margin-left: 10px" v-model="topic2"></el-input>
+    </div>
+    <div style="width: 400px;display: flex;margin-top: 10px">
+      <el-button @click="sendAuth">鉴权</el-button>
+      <el-input style="margin-left: 10px" v-model="pass"></el-input>
+    </div>
+    <div style="width: 400px;margin-top: 10px">
+      <el-input type="textarea" rows="10" v-model="msg"></el-input>
+      <div style="display: flex;justify-content: flex-end;margin-top: 10px" >
+        <el-button type="success" @click="sendMessage">发送信息</el-button>
+      </div>
+    </div>
+  </div>
+  <div style="width: 500px;margin-left: 10px;height: 600px;overflow: auto">
+    <div v-for="e in list" style="padding: 10px;box-sizing: border-box;background: #f1f1ff;border-radius: 5px;margin-bottom: 10px">
+      <div>{{e.eventName}} - {{e.time}}</div>
+      <div>{{e.data}}</div>
+    </div>
+  </div>
+</div>
+<script>
+  const App = {
+    data() {
+      return {
+        message: "Hello Element Plus",
+        client: null,
+        ws:"ws://127.0.0.1:8080/ws",
+        topic1:"",
+        topic2:"",
+        msg:"",
+        pass:"",
+        list:[]
+      };
+    },
+    methods: {
+      sub() {
+        this.client.subTopic(this.topic1)
+      },
+      unsub() {
+        this.client.unSubTopic(this.topic2)
+      },
+      sendMessage() {
+        this.client.sendMessage(this.topic1, this.msg)
+      },
+      sendAuth() {
+        this.client.sendAuth(this.pass)
+      },
+      connect(){
+        this.client = new QYSubPubClient({
+          host: this.ws,
+        })
+        this.client.onmessage = (evt, eventName, data) => {
+          console.log(eventName, data)
+          this.list.unshift({
+            eventName,
+            time:new Date().toLocaleString(),
+            data
+          })
+        }
+        this.client.connect()
+      },
+      close(){
+        this.client.close()
+      }
+    },
+    mounted() {
+
+    }
+  };
+  const app = Vue.createApp(App);
+  app.use(ElementPlus);
+  app.mount("#app");
+
+
+</script>
+</body>
+</html>

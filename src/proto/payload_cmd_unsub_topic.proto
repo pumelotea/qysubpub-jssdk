@@ -1,0 +1,8 @@
+syntax = "proto3";            //指定版本信息，不指定会报错
+option go_package = "./;data_struct";
+package data_struct;            //后期生成go文件的包名
+message QYPayloadCmdUnSubTopic {
+  repeated string topics = 2;
+}
+
+
