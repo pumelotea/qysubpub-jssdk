@@ -30,6 +30,10 @@
       <el-button @click="sendAuth">鉴权</el-button>
       <el-input style="margin-left: 10px" v-model="pass"></el-input>
     </div>
+    <div style="margin-top: 10px">
+      <el-tag type="success" v-if="isOnline">连接成功</el-tag>
+      <el-tag type="danger" v-else>连接断开</el-tag>
+    </div>
     <div style="width: 400px;margin-top: 10px">
       <el-input type="textarea" rows="10" v-model="msg"></el-input>
       <div style="display: flex;justify-content: flex-end;margin-top: 10px" >
@@ -55,7 +59,8 @@
         topic2:"",
         msg:"",
         pass:"",
-        list:[]
+        list:[],
+        isOnline:false
       };
     },
     methods: {
@@ -76,17 +81,23 @@
           host: this.ws,
         })
         this.client.onmessage = (evt, eventName, data) => {
-          console.log(eventName, data)
           this.list.unshift({
             eventName,
             time:new Date().toLocaleString(),
             data
           })
         }
+        this.client.onopen = () =>{
+          this.isOnline = true
+        }
+        this.onclose = () =>{
+          this.isOnline = false
+        }
         this.client.connect()
       },
       close(){
         this.client.close()
+        this.isOnline = false
       }
     },
     mounted() {

@@ -69,7 +69,8 @@ proto.data_struct.QYPayloadOnSubTopic.prototype.toObject = function(opt_includeI
  */
 proto.data_struct.QYPayloadOnSubTopic.toObject = function(includeInstance, msg) {
   var f, obj = {
-    status: jspb.Message.getBooleanFieldWithDefault(msg, 1, false)
+    status: jspb.Message.getBooleanFieldWithDefault(msg, 1, false),
+    detailMap: (f = msg.getDetailMap()) ? f.toObject(includeInstance, undefined) : []
   };
 
   if (includeInstance) {
@@ -110,6 +111,12 @@ proto.data_struct.QYPayloadOnSubTopic.deserializeBinaryFromReader = function(msg
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setStatus(value);
       break;
+    case 2:
+      var value = msg.getDetailMap();
+      reader.readMessage(value, function(message, reader) {
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readBool, null, "", false);
+         });
+      break;
     default:
       reader.skipField();
       break;
@@ -146,6 +153,10 @@ proto.data_struct.QYPayloadOnSubTopic.serializeBinaryToWriter = function(message
       f
     );
   }
+  f = message.getDetailMap(true);
+  if (f && f.getLength() > 0) {
+    f.serializeBinary(2, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeBool);
+  }
 };
 
 
@@ -165,6 +176,28 @@ proto.data_struct.QYPayloadOnSubTopic.prototype.getStatus = function() {
 proto.data_struct.QYPayloadOnSubTopic.prototype.setStatus = function(value) {
   return jspb.Message.setProto3BooleanField(this, 1, value);
 };
+
+
+/**
+ * map<string, bool> detail = 2;
+ * @param {boolean=} opt_noLazyCreate Do not create the map if
+ * empty, instead returning `undefined`
+ * @return {!jspb.Map<string,boolean>}
+ */
+proto.data_struct.QYPayloadOnSubTopic.prototype.getDetailMap = function(opt_noLazyCreate) {
+  return /** @type {!jspb.Map<string,boolean>} */ (
+      jspb.Message.getMapField(this, 2, opt_noLazyCreate,
+      null));
+};
+
+
+/**
+ * Clears values from the map. The map will be non-null.
+ * @return {!proto.data_struct.QYPayloadOnSubTopic} returns this
+ */
+proto.data_struct.QYPayloadOnSubTopic.prototype.clearDetailMap = function() {
+  this.getDetailMap().clear();
+  return this;};
 
 
 goog.object.extend(exports, proto.data_struct);

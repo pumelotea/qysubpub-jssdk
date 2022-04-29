@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server"
+    "dev": "webpack --mode development -w -c webpack.dev.config.js",
+    "build": "webpack --progress",
+    "preview": "webpack-dev-server -c webpack.preview.config.js"
   },
   "keywords": [],
   "author": "",
