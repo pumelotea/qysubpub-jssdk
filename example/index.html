@@ -90,7 +90,7 @@
         this.client.onopen = () =>{
           this.isOnline = true
         }
-        this.onclose = () =>{
+        this.client.onclose = () =>{
           this.isOnline = false
         }
         this.client.connect()
