@@ -13,29 +13,43 @@
 <body>
 <div id="app" style="display: flex">
   <div>
-    <div style="width: 400px;display: flex">
-      <el-button @click="connect">连接</el-button>
-      <el-button @click="close">断开</el-button>
+    <div style="width: 600px;display: flex">
+      <el-button @click="connect">打开连接</el-button>
+      <el-button @click="close">客户端断开</el-button>
+      <el-button @click="sendClose">服务器断开</el-button>
       <el-input style="margin-left: 10px" v-model="ws"></el-input>
     </div>
-    <div style="width: 400px;display: flex;margin-top: 10px">
-      <el-button @click="sub">订阅</el-button>
-      <el-input style="margin-left: 10px" v-model="topic1"></el-input>
+    <div style="width: 600px;display: flex;margin-top: 10px">
+      <el-button @click="sendReuse">复用连接</el-button>
+      <el-input style="margin-left: 10px" v-model="clientId" placeholder="clientId"></el-input>
     </div>
-    <div style="width: 400px;display: flex;margin-top: 10px">
-      <el-button @click="unsub">退订</el-button>
-      <el-input style="margin-left: 10px" v-model="topic2"></el-input>
+    <div style="width: 600px;display: flex;margin-top: 10px">
+      <el-button @click="sub">订阅主题</el-button>
+      <el-input style="margin-left: 10px" v-model="topic1" placeholder="topic"></el-input>
     </div>
-    <div style="width: 400px;display: flex;margin-top: 10px">
-      <el-button @click="sendAuth">鉴权</el-button>
-      <el-input style="margin-left: 10px" v-model="pass"></el-input>
+    <div style="width: 600px;display: flex;margin-top: 10px">
+      <el-button @click="unsub">退订主题</el-button>
+      <el-input style="margin-left: 10px" v-model="topic2" placeholder="topic"></el-input>
+    </div>
+    <div style="width: 600px;display: flex;margin-top: 10px">
+      <el-button @click="sendAuth">连接鉴权</el-button>
+      <el-input style="margin-left: 10px" v-model="pass" placeholder="password"></el-input>
+    </div>
+    <div style="width: 600px;display: flex;margin-top: 10px">
+      <el-button @click="sendAddWillMessage">发送遗言</el-button>
+      <el-input style="margin-left: 10px" v-model="willTopic1" placeholder="topic"></el-input>
+      <el-input style="margin-left: 10px" v-model="willMsg1" placeholder="message"></el-input>
+    </div>
+    <div style="width: 600px;display: flex;margin-top: 10px">
+      <el-button @click="sendRemoveWillMessage">取消遗言</el-button>
+      <el-input style="margin-left: 10px" v-model="willTopic2" placeholder="topic"></el-input>
     </div>
     <div style="margin-top: 10px">
       <el-tag type="success" v-if="isOnline">连接成功</el-tag>
       <el-tag type="danger" v-else>连接断开</el-tag>
     </div>
-    <div style="width: 400px;margin-top: 10px">
-      <el-input type="textarea" rows="10" v-model="msg"></el-input>
+    <div style="width: 600px;margin-top: 10px">
+      <el-input type="textarea" rows="10" v-model="msg" placeholder="message"></el-input>
       <div style="display: flex;justify-content: flex-end;margin-top: 10px" >
         <el-button type="success" @click="sendMessage">发送信息</el-button>
       </div>
@@ -52,15 +66,18 @@
   const App = {
     data() {
       return {
-        message: "Hello Element Plus",
         client: null,
         ws:"ws://127.0.0.1:8080/ws",
-        topic1:"",
-        topic2:"",
-        msg:"",
-        pass:"",
+        topic1:"test-topic",
+        topic2:"test-topic",
+        clientId:"",
+        msg:"Hello,IM QYSUBPUB!",
+        pass:"123456",
         list:[],
-        isOnline:false
+        isOnline:false,
+        willTopic1:"will",
+        willMsg1:"Hello Element Plus",
+        willTopic2:"will"
       };
     },
     methods: {
@@ -75,6 +92,18 @@
       },
       sendAuth() {
         this.client.sendAuth(this.pass)
+      },
+      sendClose(){
+        this.client.sendClose()
+      },
+      sendAddWillMessage(){
+        this.client.sendAddWillMessage(this.willTopic1,this.willMsg1)
+      },
+      sendRemoveWillMessage(){
+        this.client.sendRemoveWillMessage(this.willTopic2)
+      },
+      sendReuse(){
+        this.client.sendReuse(this.clientId)
       },
       connect(){
         this.client = new QYSubPubClient({

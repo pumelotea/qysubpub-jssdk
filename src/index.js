@@ -1,29 +1,45 @@
+const {Any} = require('google-protobuf/google/protobuf/any_pb')
 const {QYCmdData} = require('./proto/cmd_data_pb')
 const {QYPayloadCmdSendMessage} = require('./proto/payload_cmd_send_message_pb')
 const {QYPayloadCmdAuth} = require('./proto/payload_cmd_auth_pb')
 const {QYPayloadCmdSubTopic} = require('./proto/payload_cmd_sub_topic_pb')
 const {QYPayloadCmdUnSubTopic} = require('./proto/payload_cmd_unsub_topic_pb')
+const {QYPayloadCmdAddWillMessage} = require('./proto/payload_cmd_add_will_message_pb')
+const {QYPayloadCmdRemoveWillMessage} = require('./proto/payload_cmd_remove_will_message_pb')
+const {QYPayloadCmdReuse} = require('./proto/payload_cmd_reuse_pb')
+
 const {QYEventData} = require('./proto/event_data_pb')
-const {Any} = require('google-protobuf/google/protobuf/any_pb')
 const {QYPayloadOnSubTopic} = require('./proto/payload_on_sub_topic_pb')
 const {QYPayloadOnUnSubTopic} = require('./proto/payload_on_unsub_topic_pb')
 const {QYPayloadOnMessage} = require('./proto/payload_on_message_pb')
 const {QYPayloadOnSendMessage} = require('./proto/payload_on_send_message_pb')
 const {QYPayloadOnAuth} = require('./proto/payload_on_auth_pb')
+const {QYPayloadOnAddWillMessage} = require('./proto/payload_on_add_will_message_pb')
+const {QYPayloadOnRemoveWillMessage} = require('./proto/payload_on_remove_will_message_pb')
+const {QYPayloadOnConnected} = require('./proto/payload_on_connected_pb')
+const {QYPayloadOnReuse} = require('./proto/payload_on_reuse_pb')
 
 const EventMap = {
   "ON_SUB_TOPIC": QYPayloadOnSubTopic,
   "ON_UNSUB_TOPIC": QYPayloadOnUnSubTopic,
   "ON_SEND_MESSAGE": QYPayloadOnSendMessage,
   "ON_AUTH": QYPayloadOnAuth,
-  "ON_MESSAGE": QYPayloadOnMessage
+  "ON_MESSAGE": QYPayloadOnMessage,
+  "ON_ADD_WILL_MESSAGE": QYPayloadOnAddWillMessage,
+  "ON_REMOVE_WILL_MESSAGE": QYPayloadOnRemoveWillMessage,
+  "ON_CONNECTED": QYPayloadOnConnected,
+  "ON_REUSE": QYPayloadOnReuse,
 }
 const EventPathMap = {
   "ON_SUB_TOPIC": "data_struct.QYPayloadOnSubTopic",
   "ON_UNSUB_TOPIC": "data_struct.QYPayloadOnUnSubTopic",
   "ON_SEND_MESSAGE": "data_struct.QYPayloadOnSendMessage",
   "ON_AUTH": "data_struct.QYPayloadOnAuth",
-  "ON_MESSAGE": "data_struct.QYPayloadOnMessage"
+  "ON_MESSAGE": "data_struct.QYPayloadOnMessage",
+  "ON_ADD_WILL_MESSAGE": "data_struct.QYPayloadOnAddWillMessage",
+  "ON_REMOVE_WILL_MESSAGE": "data_struct.QYPayloadOnRemoveWillMessage",
+  "ON_CONNECTED": "data_struct.QYPayloadOnConnected",
+  "ON_REUSE": "data_struct.QYPayloadOnReuse"
 }
 
 class QYSubPubClient {
@@ -112,9 +128,15 @@ class QYSubPubClient {
   }
 
   ping() {
-    let data = new QYCmdData()
-    data.setCmd("CMD_PING")
-    this.send(data)
+    let _data = new QYCmdData()
+    _data.setCmd("CMD_PING")
+    this.send(_data)
+  }
+
+  sendClose() {
+    let _data = new QYCmdData()
+    _data.setCmd("CMD_CLOSE")
+    this.send(_data)
   }
 
   subTopic(topic) {
@@ -122,10 +144,10 @@ class QYSubPubClient {
     payload.setTopicsList([topic])
     const any = new Any()
     any.pack(payload.serializeBinary(), "data_struct.QYPayloadCmdSubTopic")
-    const data = new QYCmdData()
-    data.setCmd("CMD_SUB_TOPIC")
-    data.setPayload(any)
-    this.send(data)
+    const _data = new QYCmdData()
+    _data.setCmd("CMD_SUB_TOPIC")
+    _data.setPayload(any)
+    this.send(_data)
   }
 
   unSubTopic(topic) {
@@ -133,10 +155,10 @@ class QYSubPubClient {
     payload.setTopicsList([topic])
     const any = new Any()
     any.pack(payload.serializeBinary(), "data_struct.QYPayloadCmdUnSubTopic")
-    const data = new QYCmdData()
-    data.setCmd("CMD_UNSUB_TOPIC")
-    data.setPayload(any)
-    this.send(data)
+    const _data = new QYCmdData()
+    _data.setCmd("CMD_UNSUB_TOPIC")
+    _data.setPayload(any)
+    this.send(_data)
   }
 
   sendMessage(topic, message) {
@@ -145,10 +167,10 @@ class QYSubPubClient {
     payload.setMessage(message)
     const any = new Any()
     any.pack(payload.serializeBinary(), "data_struct.QYPayloadCmdSendMessage")
-    const data = new QYCmdData()
-    data.setCmd("CMD_SEND_MESSAGE")
-    data.setPayload(any)
-    this.send(data)
+    const _data = new QYCmdData()
+    _data.setCmd("CMD_SEND_MESSAGE")
+    _data.setPayload(any)
+    this.send(_data)
   }
 
   sendAuth(data) {
@@ -161,6 +183,41 @@ class QYSubPubClient {
     _data.setPayload(any)
     this.send(_data)
   }
-}
 
+  sendAddWillMessage(topic, message) {
+    const payload = new QYPayloadCmdAddWillMessage()
+    payload.setTopic(topic)
+    payload.setMessage(message)
+    const any = new Any()
+    any.pack(payload.serializeBinary(), "data_struct.QYPayloadCmdAddWillMessage")
+    const _data = new QYCmdData()
+    _data.setCmd("CMD_ADD_WILL_MESSAGE")
+    _data.setPayload(any)
+    this.send(_data)
+  }
+
+  sendRemoveWillMessage(topic, message) {
+    const payload = new QYPayloadCmdRemoveWillMessage()
+    payload.setTopic(topic)
+    payload.setMessage(message)
+    const any = new Any()
+    any.pack(payload.serializeBinary(), "data_struct.QYPayloadCmdRemoveWillMessage")
+    const _data = new QYCmdData()
+    _data.setCmd("CMD_REMOVE_WILL_MESSAGE")
+    _data.setPayload(any)
+    this.send(_data)
+  }
+
+  sendReuse(clientId) {
+    const payload = new QYPayloadCmdReuse()
+    payload.setClientid(clientId)
+    const any = new Any()
+    any.pack(payload.serializeBinary(), "data_struct.QYPayloadCmdReuse")
+    const _data = new QYCmdData()
+    _data.setCmd("CMD_REUSE")
+    _data.setPayload(any)
+    this.send(_data)
+  }
+
+}
 window.QYSubPubClient = QYSubPubClient
